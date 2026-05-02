@@ -89,16 +89,6 @@ registraduria/
     ├─ evidencia-400-invalid-id.png
     └─ evidencia-jacoco-cobertura.png
 
-wiki/
- ├─ 01-Inicio.md                   # Dominio, alcance y equipo
- ├─ 02-Tipos-de-Pruebas.md         # Unitarias vs Integración vs Sistema
- ├─ 03-Arquitectura-Limpia.md      # Diagrama de capas + enlaces al código
- ├─ 04-Pruebas-de-Integracion.md   # H2 + patrón AAA + casos de prueba
- ├─ 05-Pruebas-con-Mockito.md      # when/verify/never + FakeRepository
- ├─ 06-Pruebas-de-Sistema.md       # HTTP + @Valid + evidencias visuales
- ├─ 07-Resultados.md               # JaCoCo 89% + Newman 7/7
- ├─ 08-Matriz-de-Pruebas.md        # 16 casos probados en tabla
- └─ 09-Conclusiones.md             # Reflexión técnica final
 ```
 
 ---
