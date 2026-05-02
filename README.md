@@ -6,7 +6,6 @@
 [![H2](https://img.shields.io/badge/H2-2.2.224-0078d4)](https://www.h2database.com/)
 [![Spring](https://img.shields.io/badge/Spring-Boot-6db33f?logo=spring)](https://spring.io/)
 [![JaCoCo](https://img.shields.io/badge/JaCoCo-0.8.12-green)](https://www.jacoco.org/jacoco/)
-[![Coverage](https://img.shields.io/badge/Coverage-89%25-brightgreen)](#-cobertura-jacoco)
 [![Maven](https://img.shields.io/badge/Maven-Build-red?logo=apachemaven)](https://maven.apache.org/)
 [![Postman](https://img.shields.io/badge/Postman-Collection-orange?logo=postman)](https://www.postman.com/juandavid-4672575/workspace/juan-david/collection/43956930-b372aee3-9745-4594-9f76-093b5e7bfa47)
 
