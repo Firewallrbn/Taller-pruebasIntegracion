@@ -4,10 +4,13 @@ import edu.unisabana.tyvs.registry.application.port.out.RegistryRepositoryPort;
 import edu.unisabana.tyvs.registry.domain.model.Gender;
 import edu.unisabana.tyvs.registry.domain.model.Person;
 import edu.unisabana.tyvs.registry.domain.model.RegisterResult;
+import edu.unisabana.tyvs.registry.infrastructure.persistence.RegistryRecord;
 import edu.unisabana.tyvs.registry.infrastructure.persistence.RegistryRepository;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Optional;
 
 import static org.junit.Assert.*;
 
@@ -86,5 +89,78 @@ public class RegistryTest {
 
         // Assert segundo registro
         assertEquals(RegisterResult.DUPLICATED, result2);
+    }
+
+    @Test
+    public void shouldReturnUnderageWhenPersonIsLessThan18() throws Exception {
+        Person p = new Person("Juan", 200, 16, Gender.MALE, true);
+
+        RegisterResult result = registry.registerVoter(p);
+
+        assertEquals(RegisterResult.UNDERAGE, result);
+        assertFalse(repo.existsById(200));
+    }
+
+    @Test
+    public void shouldReturnDeadWhenPersonIsNotAlive() throws Exception {
+        Person p = new Person("Maria", 300, 40, Gender.FEMALE, false);
+
+        RegisterResult result = registry.registerVoter(p);
+
+        assertEquals(RegisterResult.DEAD, result);
+        assertFalse(repo.existsById(300));
+    }
+
+    @Test
+    public void shouldReturnInvalidWhenIdIsZeroOrNegative() throws Exception {
+        Person pZero = new Person("Pedro", 0, 30, Gender.MALE, true);
+        Person pNeg = new Person("Luis", -1, 30, Gender.MALE, true);
+
+        assertEquals(RegisterResult.INVALID, registry.registerVoter(pZero));
+        assertEquals(RegisterResult.INVALID, registry.registerVoter(pNeg));
+        assertFalse(repo.existsById(0));
+        assertFalse(repo.existsById(-1));
+    }
+
+    @Test
+    public void shouldReturnInvalidWhenPersonIsNull() throws Exception {
+        RegisterResult result = registry.registerVoter(null);
+
+        assertEquals(RegisterResult.INVALID, result);
+    }
+
+    @Test
+    public void shouldFindSavedPersonById() throws Exception {
+        Person p = new Person("Laura", 500, 28, Gender.FEMALE, true);
+        registry.registerVoter(p);
+
+        Optional<RegistryRecord> found = repo.findById(500);
+
+        assertTrue(found.isPresent());
+        assertEquals(500, found.get().getId());
+        assertEquals("Laura", found.get().getName());
+        assertEquals(28, found.get().getAge());
+        assertTrue(found.get().isAlive());
+    }
+
+    @Test
+    public void shouldReturnEmptyWhenPersonNotFound() throws Exception {
+        Optional<RegistryRecord> found = repo.findById(999);
+
+        assertFalse(found.isPresent());
+    }
+
+    @Test
+    public void shouldUseFullConstructorForRepository() throws Exception {
+        String jdbc = "jdbc:h2:mem:regdb2;DB_CLOSE_DELAY=-1";
+        RegistryRepository fullRepo = new RegistryRepository(jdbc, "sa", "");
+        fullRepo.initSchema();
+        fullRepo.deleteAll();
+        Registry reg = new Registry(fullRepo);
+
+        RegisterResult result = reg.registerVoter(new Person("Test", 1, 30, Gender.MALE, true));
+
+        assertEquals(RegisterResult.VALID, result);
+        assertTrue(fullRepo.existsById(1));
     }
 }

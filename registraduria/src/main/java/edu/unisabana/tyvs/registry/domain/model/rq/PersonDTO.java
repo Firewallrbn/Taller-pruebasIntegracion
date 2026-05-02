@@ -1,10 +1,22 @@
 package edu.unisabana.tyvs.registry.domain.model.rq;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+
 public class PersonDTO {
+
+    @NotBlank(message = "name is required")
     private String name;
+
+    @Min(value = 1, message = "id must be greater than 0")
     private int id;
+
+    @Min(value = 0, message = "age must be non-negative")
     private int age;
+
+    @NotBlank(message = "gender is required")
     private String gender;
+
     private boolean alive;
 
     public PersonDTO() {

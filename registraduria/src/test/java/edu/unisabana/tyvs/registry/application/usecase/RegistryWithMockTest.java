@@ -10,6 +10,8 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import java.sql.SQLException;
+
 /**
  * Clase de prueba unitaria para {@link Registry} utilizando un mock de {@link RegistryRepositoryPort}.
  *
@@ -71,5 +73,25 @@ public class RegistryWithMockTest {
         // Assert: verificar resultado y comportamiento esperado del mock
         assertEquals(RegisterResult.DUPLICATED, result);
         verify(repo, never()).save(anyInt(), anyString(), anyInt(), anyBoolean());
+    }
+
+    @Test
+    public void shouldCallSaveWhenPersonDoesNotExist() throws Exception {
+        when(repo.existsById(8)).thenReturn(false);
+        Person p = new Person("Carlos", 8, 25, Gender.MALE, true);
+
+        RegisterResult result = registry.registerVoter(p);
+
+        assertEquals(RegisterResult.VALID, result);
+        verify(repo).save(8, "Carlos", 25, true);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void shouldThrowIllegalStateExceptionWhenSaveFails() throws Exception {
+        when(repo.existsById(9)).thenReturn(false);
+        doThrow(new SQLException("Connection lost")).when(repo).save(9, "Lucia", 30, true);
+        Person p = new Person("Lucia", 9, 30, Gender.FEMALE, true);
+
+        registry.registerVoter(p);
     }
 }

@@ -1,0 +1,270 @@
+{
+  "collection": {
+    "info": {
+      "name": "Registraduria - Pruebas de Sistema",
+      "description": "# Registraduria - Pruebas de Sistema\n\nColeccion de requests para probar el endpoint `POST /register` del sistema de Registraduria.\n\n## Endpoint\n\n`POST http://localhost:8080/register`\n\nContent-Type: `application/json`\n\n## Casos de prueba\n\n| # | Caso | HTTP | Body |\n|---|------|------|------|\n| 1 | Persona valida | 200 | VALID |\n| 2 | Persona duplicada | 409 | DUPLICATED |\n| 3 | Menor de edad | 422 | UNDERAGE |\n| 4 | Persona fallecida | 422 | DEAD |\n| 5 | ID invalido (@Valid) | 400 | validation msg |\n| 6 | Genero invalido | 400 | INVALID_GENDER |\n| 7 | JSON incompleto (@Valid) | 400 | validation msg |\n\n## Como ejecutar\n\n1. Inicia la app: `mvn spring-boot:run`\n2. Ejecuta esta coleccion en Postman Runner o con Newman:\n   ```bash\n   newman run registraduria-collection.json\n   ```",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "1. Register Valid Person (200)",
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test(\"Status 200 OK\", () => {",
+                "    pm.response.to.have.status(200);",
+                "});",
+                "pm.test(\"Body = VALID\", () => {",
+                "    pm.expect(pm.response.text()).to.equal(\"VALID\");",
+                "});"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"name\": \"Ana\",\n  \"id\": 100,\n  \"age\": 30,\n  \"gender\": \"FEMALE\",\n  \"alive\": true\n}"
+          },
+          "url": {
+            "raw": "{{baseUrl}}/register",
+            "host": ["{{baseUrl}}"],
+            "path": ["register"]
+          },
+          "description": "Registra una persona valida: mayor de edad, viva, ID positivo."
+        },
+        "response": []
+      },
+      {
+        "name": "2. Register Duplicated Person (409)",
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test(\"Status 409 CONFLICT\", () => {",
+                "    pm.response.to.have.status(409);",
+                "});",
+                "pm.test(\"Body = DUPLICATED\", () => {",
+                "    pm.expect(pm.response.text()).to.equal(\"DUPLICATED\");",
+                "});"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"name\": \"Pedro\",\n  \"id\": 100,\n  \"age\": 25,\n  \"gender\": \"MALE\",\n  \"alive\": true\n}"
+          },
+          "url": {
+            "raw": "{{baseUrl}}/register",
+            "host": ["{{baseUrl}}"],
+            "path": ["register"]
+          },
+          "description": "Intenta registrar una segunda persona con el mismo ID=100. Debe retornar DUPLICATED (409)."
+        },
+        "response": []
+      },
+      {
+        "name": "3. Register Underage Person (422)",
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test(\"Status 422 UNPROCESSABLE\", () => {",
+                "    pm.response.to.have.status(422);",
+                "});",
+                "pm.test(\"Body = UNDERAGE\", () => {",
+                "    pm.expect(pm.response.text()).to.equal(\"UNDERAGE\");",
+                "});"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"name\": \"Juan\",\n  \"id\": 300,\n  \"age\": 16,\n  \"gender\": \"MALE\",\n  \"alive\": true\n}"
+          },
+          "url": {
+            "raw": "{{baseUrl}}/register",
+            "host": ["{{baseUrl}}"],
+            "path": ["register"]
+          },
+          "description": "Registra una persona de 16 anios (menor de edad). Debe retornar UNDERAGE (422)."
+        },
+        "response": []
+      },
+      {
+        "name": "4. Register Dead Person (422)",
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test(\"Status 422 UNPROCESSABLE\", () => {",
+                "    pm.response.to.have.status(422);",
+                "});",
+                "pm.test(\"Body = DEAD\", () => {",
+                "    pm.expect(pm.response.text()).to.equal(\"DEAD\");",
+                "});"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"name\": \"Maria\",\n  \"id\": 400,\n  \"age\": 45,\n  \"gender\": \"FEMALE\",\n  \"alive\": false\n}"
+          },
+          "url": {
+            "raw": "{{baseUrl}}/register",
+            "host": ["{{baseUrl}}"],
+            "path": ["register"]
+          },
+          "description": "Registra una persona fallecida. Debe retornar DEAD (422)."
+        },
+        "response": []
+      },
+      {
+        "name": "5. Register Invalid ID - @Valid (400)",
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test(\"Status 400 BAD REQUEST\", () => {",
+                "    pm.response.to.have.status(400);",
+                "});",
+                "pm.test(\"Body contains validation message\", () => {",
+                "    pm.expect(pm.response.text()).to.include(\"id must be greater than 0\");",
+                "});"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"name\": \"Luis\",\n  \"id\": 0,\n  \"age\": 30,\n  \"gender\": \"MALE\",\n  \"alive\": true\n}"
+          },
+          "url": {
+            "raw": "{{baseUrl}}/register",
+            "host": ["{{baseUrl}}"],
+            "path": ["register"]
+          },
+          "description": "Envia un ID=0. La validacion @Min(1) en PersonDTO atrapa el error antes del controller y retorna 400 con mensaje de validacion."
+        },
+        "response": []
+      },
+      {
+        "name": "6. Register Invalid Gender (400)",
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test(\"Status 400 BAD REQUEST\", () => {",
+                "    pm.response.to.have.status(400);",
+                "});",
+                "pm.test(\"Body = INVALID_GENDER\", () => {",
+                "    pm.expect(pm.response.text()).to.equal(\"INVALID_GENDER\");",
+                "});"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"name\": \"Laura\",\n  \"id\": 500,\n  \"age\": 20,\n  \"gender\": \"OTHER\",\n  \"alive\": true\n}"
+          },
+          "url": {
+            "raw": "{{baseUrl}}/register",
+            "host": ["{{baseUrl}}"],
+            "path": ["register"]
+          },
+          "description": "Envia un genero invalido (OTHER). El controller captura IllegalArgumentException de Gender.valueOf() y retorna 400 INVALID_GENDER."
+        },
+        "response": []
+      },
+      {
+        "name": "7. Register Missing Fields (400)",
+        "event": [
+          {
+            "listen": "test",
+            "script": {
+              "exec": [
+                "pm.test(\"Status 400 BAD REQUEST\", () => {",
+                "    pm.response.to.have.status(400);",
+                "});",
+                "pm.test(\"Body contains validation error\", () => {",
+                "    var body = pm.response.text();",
+                "    pm.expect(body).to.be.a('string').that.is.not.empty;",
+                "});"
+              ],
+              "type": "text/javascript"
+            }
+          }
+        ],
+        "request": {
+          "method": "POST",
+          "header": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\"name\": \"Ana\"}"
+          },
+          "url": {
+            "raw": "{{baseUrl}}/register",
+            "host": ["{{baseUrl}}"],
+            "path": ["register"]
+          },
+          "description": "Envia un JSON incompleto (solo name). Las validaciones @Valid de PersonDTO atrapan los campos faltantes y retornan 400."
+        },
+        "response": []
+      }
+    ],
+    "variable": [
+      {
+        "key": "baseUrl",
+        "value": "http://localhost:8080"
+      }
+    ]
+  }
+}
